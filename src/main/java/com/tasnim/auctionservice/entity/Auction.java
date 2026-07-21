@@ -35,30 +35,44 @@ public class Auction {
 
     private String sellerId;
 
+    @Column(precision = 19, scale = 2, nullable = false)
     private BigDecimal startingPrice;
+
+    @Column(precision = 19, scale = 2)
     private BigDecimal reservePrice;
+
+    @Column(precision = 19, scale = 2)
     private BigDecimal buyNowPrice;
+
+    @Column(precision = 19, scale = 2, nullable = false)
     private BigDecimal currentPrice;
 
     private String highestBidderId;
 
+    @Column(nullable = false)
     private Long bidCount;
 
     private String winnerId;
 
+    @Column(precision = 19, scale = 2)
     private BigDecimal winningBidAmount;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private AuctionStatus status;
 
     @Enumerated(EnumType.STRING)
     private AuctionEndReason endReason;
 
+    @Column(nullable = false)
     private Instant startedAt;
+
+    @Column(nullable = false)
     private Instant endedAt;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
+
     @Column(nullable = false)
     private Instant updatedAt;
 

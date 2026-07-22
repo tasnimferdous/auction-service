@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Slf4j
 @Service
 @Transactional
@@ -69,7 +71,19 @@ public class InternalAuctionServiceImpl implements InternalAuctionService {
 
     @Override
     public void processBidUpdate(Long auctionId, BidUpdateRequest request) {
+        log.info("Processing bid update. auctionId={}, bidderId={}, amount={}",
+                auctionId, request.getBidderId(), request.getAmount());
 
+        Auction auction = getAuction(auctionId);
+        validateBidUpdate(auction, request);
+
+        auction.setCurrentPrice(request.getAmount());
+        auction.setHighestBidderId(request.getBidderId());
+        auction.setBidCount(auction.getBidCount() + 1);
+        auctionRepository.save(auction);
+
+        log.info("Bid processed successfully. auctionId={}, bidderId={}, amount={}",
+                auctionId, request.getBidderId(), request.getAmount());
     }
 
     private Auction buildAuction(AuctionCreateRequest request) {
@@ -126,5 +140,24 @@ public class InternalAuctionServiceImpl implements InternalAuctionService {
         auction.setWinnerId(null);
         auction.setWinningBidAmount(null);
         auction.setEndReason(AuctionEndReason.NORMAL_END);
+    }
+
+    private void validateBidUpdate(Auction auction, BidUpdateRequest request) {
+        isActiveAuction(auction);
+        validateBidAmount(auction, request.getAmount());
+    }
+
+    private void isActiveAuction(Auction auction) {
+        if (auction.getStatus() != AuctionStatus.ACTIVE) {
+            throw new BusinessException(
+                    "Auction is not active");
+        }
+    }
+
+    private void validateBidAmount(Auction auction, BigDecimal amount) {
+        if (amount.compareTo(auction.getCurrentPrice()) <= 0) {
+            throw new BusinessException(
+                    "Bid amount must be greater than current price");
+        }
     }
 }

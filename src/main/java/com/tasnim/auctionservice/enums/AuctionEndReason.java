@@ -1,8 +1,9 @@
 package com.tasnim.auctionservice.enums;
 
 public enum AuctionEndReason {
-    NORMAL_END,
+    SOLD,
     BUY_NOW,
-    ADMIN_CANCELLED,
+    RESERVE_NOT_MET,
+    CANCELLED,
     LISTING_REMOVED
 }

@@ -8,7 +8,7 @@ public interface InternalAuctionService {
 
     void completeAuction(Long auctionId);
 
-    void cancelAuction(Long auctionId);
-
     void processBidUpdate(Long auctionId, BidUpdateRequest request);
+
+    void cancelAuction(Long auctionId);
 }

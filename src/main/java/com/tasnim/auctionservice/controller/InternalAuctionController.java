@@ -36,4 +36,10 @@ public class InternalAuctionController {
         internalAuctionService.processBidUpdate(auctionId, request);
         return ResponseUtil.success("Bid processed successfully");
     }
+
+    @PostMapping("/{auctionId}/cancel")
+    public CommonResponse<Void> cancelAuction(@PathVariable Long auctionId) {
+        internalAuctionService.cancelAuction(auctionId);
+        return ResponseUtil.success("Auction cancelled successfully");
+    }
 }

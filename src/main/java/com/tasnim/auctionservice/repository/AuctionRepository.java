@@ -17,7 +17,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     Page<Auction> findBySellerId(String sellerId, Pageable pageable);
 
-    Page<Auction> findByWinnerId(String winnerId, AuctionStatus status, Pageable pageable);
+    Page<Auction> findByWinnerIdAndStatus(String winnerId, AuctionStatus status, Pageable pageable);
 
     boolean existsByListingIdAndStatus(Long listingId, AuctionStatus status);
 }

@@ -12,10 +12,8 @@ import java.time.Instant;
 @Table(
         indexes = {
                 @Index(name = "idx_auction_listing_id", columnList = "listingId"),
-                @Index(name = "idx_auction_seller_id", columnList = "sellerId"),
-                @Index(name = "idx_auction_status", columnList = "status"),
-                @Index(name = "idx_auction_winner_id", columnList = "winnerId"),
                 @Index(name = "idx_auction_seller_status", columnList = "sellerId,status"),
+                @Index(name = "idx_auction_winner_status", columnList = "winnerId,status"),
                 @Index(name = "idx_auction_status_ended_at", columnList = "status,endedAt")
         }
 )

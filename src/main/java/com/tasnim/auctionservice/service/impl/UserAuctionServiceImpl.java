@@ -1,13 +1,11 @@
 package com.tasnim.auctionservice.service.impl;
 
-import com.tasnim.auctionservice.dto.response.AuctionDetailsResponse;
 import com.tasnim.auctionservice.dto.response.AuctionResponse;
-import com.tasnim.auctionservice.entity.Auction;
 import com.tasnim.auctionservice.enums.AuctionStatus;
 import com.tasnim.auctionservice.mapper.AuctionMapper;
 import com.tasnim.auctionservice.repository.AuctionRepository;
-import com.tasnim.auctionservice.service.PublicAuctionService;
-import com.tasnim.commonlibrary.exceptions.ResourceNotFoundException;
+import com.tasnim.auctionservice.service.UserAuctionService;
+import com.tasnim.commonlibrary.utils.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,11 +18,11 @@ import static com.tasnim.auctionservice.utils.AuctionUtil.validateSorting;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-public class PublicAuctionServiceImpl implements PublicAuctionService {
+public class UserAuctionServiceImpl implements UserAuctionService {
     private final AuctionRepository auctionRepository;
     private final AuctionMapper auctionMapper;
 
-    public PublicAuctionServiceImpl(
+    public UserAuctionServiceImpl(
             AuctionRepository auctionRepository,
             AuctionMapper auctionMapper) {
         this.auctionRepository = auctionRepository;
@@ -32,30 +30,32 @@ public class PublicAuctionServiceImpl implements PublicAuctionService {
     }
 
     @Override
-    public AuctionDetailsResponse getAuctionDetails(Long auctionId) {
-        log.info("Fetching auction details. auctionId={}", auctionId);
+    public Page<AuctionResponse> getMyAuctions(int page, int size, String sortBy, String direction) {
+        String sellerId = SecurityUtil.getCurrentUserId();
 
-        return auctionMapper
-                .toAuctionDetailsResponse(getAuction(auctionId));
-    }
-
-    @Override
-    public Page<AuctionResponse> getActiveAuctions(int page, int size, String sortBy, String direction) {
-        log.info("Fetching active auctions. page={}, size={}, sortBy={}, direction={}",
-                page, size, sortBy, direction);
+        log.info("Fetching auctions for seller. sellerId={}, page={}, size={}, sortBy={}, direction={}",
+                sellerId, page, size, sortBy, direction);
 
         validateSorting(sortBy, direction);
         Pageable pageable = buildPageable(page, size, sortBy, direction);
 
         return auctionRepository
-                .findByStatus(AuctionStatus.ACTIVE, pageable)
+                .findBySellerId(sellerId, pageable)
                 .map(auctionMapper::toAuctionResponse);
     }
 
-    private Auction getAuction(Long auctionId) {
-        return auctionRepository.findById(auctionId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Auction not found with id: " + auctionId));
+    @Override
+    public Page<AuctionResponse> getWonAuctions(int page, int size, String sortBy, String direction) {
+        String winnerId = SecurityUtil.getCurrentUserId();
+
+        log.info("Fetching won auctions for user. winnerId={}, page={}, size={}, sortBy={}, direction={}",
+                winnerId, page, size, sortBy, direction);
+
+        validateSorting(sortBy, direction);
+        Pageable pageable = buildPageable(page, size, sortBy, direction);
+
+        return auctionRepository
+                .findByWinnerIdAndStatus(winnerId, AuctionStatus.ENDED, pageable)
+                .map(auctionMapper::toAuctionResponse);
     }
 }

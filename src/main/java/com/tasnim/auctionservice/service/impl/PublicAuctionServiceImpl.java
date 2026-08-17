@@ -23,7 +23,6 @@ import static com.tasnim.auctionservice.utils.Constants.ALLOWED_SORT_FIELDS;
 @Service
 @Transactional(readOnly = true)
 public class PublicAuctionServiceImpl implements PublicAuctionService {
-
     private final AuctionRepository auctionRepository;
     private final AuctionMapper auctionMapper;
 
